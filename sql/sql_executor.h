@@ -270,13 +270,13 @@ private:
 
 
 void setup_tmptable_write_func(QEP_TAB *tab);
-enum_nested_loop_state sub_select_op(JOIN *join, QEP_TAB *qep_tab, bool
+extern "C" enum_nested_loop_state sub_select_op(JOIN *join, QEP_TAB *qep_tab, bool
                                         end_of_records);
 enum_nested_loop_state end_send_group(JOIN *join, QEP_TAB *qep_tab,
                                       bool end_of_records);
 enum_nested_loop_state end_write_group(JOIN *join, QEP_TAB *qep_tab,
                                        bool end_of_records);
-enum_nested_loop_state sub_select(JOIN *join,QEP_TAB *qep_tab, bool
+extern "C" enum_nested_loop_state sub_select(JOIN *join,QEP_TAB *qep_tab, bool
                                   end_of_records);
 enum_nested_loop_state
 evaluate_join_record(JOIN *join, QEP_TAB *qep_tab, int error);

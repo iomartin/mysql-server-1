@@ -109,6 +109,10 @@ SET(SQL_EMBEDDED_SOURCES
   ${IMPORTED_SOURCES}
 )
 
+IF (WITH_LLVM)
+    set_source_files_properties("../sql/sql_compiler.cc" PROPERTIES COMPILE_FLAGS "-std=c++11")
+ENDIF()
+
 INCLUDE(${MYSQL_CMAKE_SCRIPT_DIR}/compile_flags.cmake)
 ADD_COMPILE_FLAGS(
   ../sql/debug_sync.cc

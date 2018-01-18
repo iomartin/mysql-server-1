@@ -47,6 +47,17 @@ MESSAGE(STATUS "Running cmake version ${CMAKE_VERSION}")
 # Will set GIT_EXECUTABLE and GIT_FOUND
 FIND_PACKAGE(Git)
 
+IF(WITH_LLVM)
+    FIND_PACKAGE(LLVM REQUIRED CONFIG)
+    include_directories(${LLVM_INCLUDE_DIRS})
+    add_definitions(${LLVM_DEFINITIONS})
+    llvm_map_components_to_libnames(llvm_libs all)
+    #set(CMAKE_EXE_LINKER_FLAGS "-L/home/martin/local/llvm/lib")
+    #set(CMAKE_EXE_LINKER_FLAGS "`llvm-config --ldflags`")
+ENDIF()
+
+OPTION(WITH_LLVM "Embed LLVM" ON)
+
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 # First, decide about build type (debug or release)

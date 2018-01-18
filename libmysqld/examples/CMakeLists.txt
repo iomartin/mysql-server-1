@@ -46,7 +46,6 @@ ENDIF()
 MYSQL_ADD_EXECUTABLE(mysqltest_embedded ../../client/mysqltest.cc)
 TARGET_LINK_LIBRARIES(mysqltest_embedded mysqlserver)
 
-
 IF(CMAKE_GENERATOR MATCHES "Xcode")
 # It does not seem possible to tell Xcode the resulting target might need
 # to be linked with C++ runtime. The project needs to have at least one C++
@@ -78,4 +77,10 @@ SET_TARGET_PROPERTIES(mysqltest_embedded PROPERTIES ENABLE_EXPORTS TRUE)
 IF(NOT INSTALL_LAYOUT MATCHES "SVR4")
   SET_TARGET_PROPERTIES(mysql_client_test_embedded PROPERTIES ENABLE_EXPORTS TRUE)
   ENDIF()
+ENDIF()
+
+IF (WITH_LLVM)
+  TARGET_LINK_LIBRARIES(mysqltest_embedded ${llvm_libs})
+  TARGET_LINK_LIBRARIES(mysql_client_test_embedded ${llvm_libs})
+  TARGET_LINK_LIBRARIES(mysql_embedded ${llvm_libs})
 ENDIF()

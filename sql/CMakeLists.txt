@@ -13,7 +13,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include 
   ${CMAKE_SOURCE_DIR}/sql/conn_handler
@@ -246,6 +245,12 @@ SET(SQL_SHARED_SOURCES
   unireg.cc
   xa.cc
 )
+
+IF(WITH_LLVM)
+  #SET(SQL_SHARED_SOURCES ${SQL_SHARED_SOURCES} sql_compiler.cc)
+  LIST(APPEND SQL_SHARED_SOURCES sql_compiler.cc)
+  SET_SOURCE_FILES_PROPERTIES(sql_compiler.cc PROPERTIES COMPILE_FLAGS "-std=c++11")
+ENDIF()
 
 SET(SQL_EXPORTED_SOURCES ${SQL_SHARED_SOURCES} PARENT_SCOPE)
 
@@ -504,6 +509,10 @@ ENDIF()
 
 SET_TARGET_PROPERTIES(mysqld PROPERTIES ENABLE_EXPORTS TRUE) 
 TARGET_LINK_LIBRARIES(mysqld sql binlog rpl master slave sql mysys mysys_ssl binlogevents_static)
+
+IF (WITH_LLVM)
+    TARGET_LINK_LIBRARIES(mysqld ${llvm_libs})
+ENDIF()
 
 # Provide plugins with minimal set of libraries
 SET(INTERFACE_LIBS ${LIBRT})

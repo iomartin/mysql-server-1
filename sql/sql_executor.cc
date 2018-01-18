@@ -38,6 +38,8 @@
 #include "sql_tmp_table.h"    // create_tmp_table
 #include "json_dom.h"    // Json_wrapper
 
+#include "sql_compiler.h"
+
 #include <algorithm>
 using std::max;
 using std::min;
@@ -45,9 +47,9 @@ using std::min;
 static void return_zero_rows(JOIN *join, List<Item> &fields);
 static void save_const_null_info(JOIN *join, table_map *save_nullinfo);
 static void restore_const_null_info(JOIN *join, table_map save_nullinfo);
-static int do_select(JOIN *join);
+extern "C" int do_select(JOIN *join);
 
-static enum_nested_loop_state
+extern "C" enum_nested_loop_state
 evaluate_join_record(JOIN *join, QEP_TAB *qep_tab);
 static enum_nested_loop_state
 evaluate_null_complemented_join_record(JOIN *join, QEP_TAB *qep_tab);
@@ -196,7 +198,9 @@ JOIN::exec()
   DBUG_PRINT("info", ("%s", thd->proc_info));
   query_result->send_result_set_metadata(*fields,
                                    Protocol::SEND_NUM_ROWS | Protocol::SEND_EOF);
-  error= do_select(this);
+  error= do_select_compile(this);
+  if (!error)
+    error= do_select(this);
   /* Accumulate the counts from all join iterations of all join parts. */
   thd->inc_examined_row_count(examined_rows);
   DBUG_PRINT("counts", ("thd->examined_row_count: %lu",
@@ -866,7 +870,7 @@ Next_select_func JOIN::get_end_select_func()
     -1  if error should be sent
 */
 
-static int
+extern "C" int
 do_select(JOIN *join)
 {
   int rc= 0;
@@ -1040,6 +1044,7 @@ do_select(JOIN *join)
     return one of enum_nested_loop_state.
 */
 
+extern "C"
 enum_nested_loop_state
 sub_select_op(JOIN *join, QEP_TAB *qep_tab, bool end_of_records)
 {
@@ -1207,6 +1212,7 @@ sub_select_op(JOIN *join, QEP_TAB *qep_tab, bool end_of_records)
     return one of enum_nested_loop_state, except NESTED_LOOP_NO_MORE_ROWS.
 */
 
+extern "C"
 enum_nested_loop_state
 sub_select(JOIN *join, QEP_TAB *const qep_tab,bool end_of_records)
 {
@@ -1467,7 +1473,8 @@ static int do_sj_reset(SJ_TMP_TABLE *sj_tbl)
   @return Nested loop state
 */
 
-static enum_nested_loop_state
+extern "C"
+enum_nested_loop_state
 evaluate_join_record(JOIN *join, QEP_TAB *const qep_tab)
 {
   bool not_used_in_distinct= qep_tab->not_used_in_distinct;
